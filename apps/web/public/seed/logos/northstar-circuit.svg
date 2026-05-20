@@ -1,0 +1,9 @@
+<svg width="900" height="600" viewBox="0 0 900 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="600" rx="48" fill="#071017"/>
+  <path d="M450 96 493 246 649 246 522 338 570 490 450 397 330 490 378 338 251 246 407 246 450 96Z" fill="#102D3A" stroke="#EAF4FF" stroke-width="10" stroke-linejoin="round"/>
+  <circle cx="450" cy="300" r="62" fill="#16F2D0"/>
+  <path d="M450 300h-210M450 300h210M450 300V142M450 300v158" stroke="#39A8FF" stroke-width="14" stroke-linecap="round" stroke-dasharray="24 26"/>
+  <circle cx="240" cy="300" r="18" fill="#F6C65B"/>
+  <circle cx="660" cy="300" r="18" fill="#F6C65B"/>
+  <text x="450" y="544" text-anchor="middle" fill="#EAF4FF" font-family="Inter, Arial" font-size="38" font-weight="700">NORTHSTAR CIRCUIT</text>
+</svg>

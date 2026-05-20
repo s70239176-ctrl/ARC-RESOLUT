@@ -1,0 +1,22 @@
+{
+  "name": "@circle-court/contracts",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "build": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:arc": "hardhat run scripts/deploy-arc.ts --network arcTestnet"
+  },
+  "dependencies": {
+    "@nomicfoundation/hardhat-ethers": "^3.0.8",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@openzeppelin/contracts": "^5.2.0",
+    "dotenv": "^16.4.7",
+    "ethers": "^6.13.5",
+    "hardhat": "^2.22.18",
+    "typescript": "^5.7.2"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2"
+  }
+}

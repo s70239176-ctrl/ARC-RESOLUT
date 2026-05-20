@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 222 58% 6%;
+  --foreground: 216 54% 97%;
+  --card: 221 52% 10%;
+  --card-foreground: 216 54% 97%;
+  --primary: 215 100% 62%;
+  --primary-foreground: 222 62% 7%;
+  --secondary: 221 48% 15%;
+  --secondary-foreground: 204 55% 94%;
+  --muted: 221 36% 16%;
+  --muted-foreground: 216 22% 72%;
+  --accent: 224 94% 72%;
+  --accent-foreground: 222 70% 7%;
+  --destructive: 0 75% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 220 38% 22%;
+  --input: 220 38% 22%;
+  --ring: 215 100% 62%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+html {
+  background: #061127;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(62, 123, 255, 0.24), transparent 34rem),
+    radial-gradient(circle at 84% 8%, rgba(139, 170, 255, 0.16), transparent 32rem),
+    linear-gradient(180deg, #061127 0%, #081a36 46%, #030814 100%);
+  color: hsl(var(--foreground));
+  letter-spacing: 0;
+}
+
+::selection {
+  background: rgba(77, 145, 255, 0.38);
+}
+
+.glass {
+  background: linear-gradient(135deg, rgba(25, 48, 94, 0.72), rgba(8, 20, 48, 0.62));
+  border: 1px solid rgba(151, 178, 255, 0.16);
+  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(22px);
+}
+
+.mesh-line {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(to bottom, black, transparent 75%);
+}

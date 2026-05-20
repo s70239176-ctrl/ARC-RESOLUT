@@ -1,0 +1,20 @@
+<svg width="900" height="600" viewBox="0 0 900 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="600" rx="48" fill="#071017"/>
+  <path d="M0 0h900v600H0z" fill="url(#bg)"/>
+  <g filter="url(#glow)">
+    <path d="M450 118 614 214v172L450 482 286 386V214l164-96Z" fill="#0C2430" stroke="#16F2D0" stroke-width="12"/>
+    <path d="M360 238h178M360 300h126M360 362h178" stroke="#EAF4FF" stroke-width="22" stroke-linecap="round"/>
+    <path d="m556 226-106 74 106 74" stroke="#39A8FF" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="450" y="544" text-anchor="middle" fill="#EAF4FF" font-family="Inter, Arial" font-size="38" font-weight="700">AURORA LEDGER</text>
+  <defs>
+    <radialGradient id="bg" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(450 250) rotate(90) scale(420 630)">
+      <stop stop-color="#123C50"/>
+      <stop offset="1" stop-color="#071017"/>
+    </radialGradient>
+    <filter id="glow" x="210" y="42" width="480" height="520" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="12" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+</svg>

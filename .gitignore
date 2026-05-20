@@ -1,0 +1,9 @@
+node_modules
+.next
+apps/web/.next
+packages/contracts/artifacts
+packages/contracts/cache
+.env
+.env.local
+*.log
+circle-court-codespace.tar.gz

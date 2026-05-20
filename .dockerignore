@@ -1,0 +1,12 @@
+.git
+.next
+node_modules
+apps/web/.next
+apps/web/node_modules
+packages/contracts/node_modules
+.env
+.env.local
+coverage
+artifacts
+cache
+typechain-types

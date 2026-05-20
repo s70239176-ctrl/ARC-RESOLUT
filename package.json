@@ -1,0 +1,18 @@
+{
+  "name": "circle-court",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@9.15.4",
+  "scripts": {
+    "dev": "pnpm --filter @circle-court/web dev",
+    "build": "pnpm --filter @circle-court/contracts build && pnpm --filter @circle-court/web build",
+    "lint": "pnpm --filter @circle-court/web lint",
+    "seed": "pnpm --filter @circle-court/web seed",
+    "contracts:build": "pnpm --filter @circle-court/contracts build",
+    "contracts:deploy:arc": "pnpm --filter @circle-court/contracts deploy:arc"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}
