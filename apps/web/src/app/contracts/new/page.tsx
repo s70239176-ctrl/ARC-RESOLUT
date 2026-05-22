@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Bot, CircleDollarSign, FileJson, Send, WalletCards } from "lucide-react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { decodeEventLog, isAddress, parseUnits } from "viem";
@@ -23,14 +23,35 @@ export default function NewContractPage() {
   const { writeContractAsync } = useWriteContract();
   const publicClient = usePublicClient({ chainId: arcTestnet.id });
 
-  const registryAddress = process.env.NEXT_PUBLIC_ESCROW_REGISTRY_ADDRESS as `0x${string}` | undefined;
-  const usdcAddress = process.env.NEXT_PUBLIC_USDC_ADDRESS as `0x${string}` | undefined;
+  const [chainConfig, setChainConfig] = useState({
+    registryAddress: process.env.NEXT_PUBLIC_ESCROW_REGISTRY_ADDRESS ?? "",
+    usdcAddress: process.env.NEXT_PUBLIC_USDC_ADDRESS ?? ""
+  });
+
+  useEffect(() => {
+    async function loadConfig() {
+      try {
+        const response = await fetch("/api/config", { cache: "no-store" });
+        const config = (await response.json()) as { escrowRegistryAddress?: string; usdcAddress?: string };
+        setChainConfig({
+          registryAddress: config.escrowRegistryAddress || process.env.NEXT_PUBLIC_ESCROW_REGISTRY_ADDRESS || "",
+          usdcAddress: config.usdcAddress || process.env.NEXT_PUBLIC_USDC_ADDRESS || ""
+        });
+      } catch {
+        // Build-time NEXT_PUBLIC values remain as fallback.
+      }
+    }
+
+    void loadConfig();
+  }, []);
 
   async function createContract(formData: FormData) {
     setResult(null);
     setLoading(true);
     try {
       if (!address || !isConnected) throw new Error("Connect your wallet before creating an escrow.");
+      const registryAddress = chainConfig.registryAddress as `0x${string}`;
+      const usdcAddress = chainConfig.usdcAddress as `0x${string}`;
       if (!registryAddress || !isAddress(registryAddress)) throw new Error("Set NEXT_PUBLIC_ESCROW_REGISTRY_ADDRESS before funding live escrows.");
       if (!usdcAddress || !isAddress(usdcAddress)) throw new Error("Set NEXT_PUBLIC_USDC_ADDRESS before funding live escrows.");
       if (!publicClient) throw new Error("Arc Testnet RPC client is not ready.");

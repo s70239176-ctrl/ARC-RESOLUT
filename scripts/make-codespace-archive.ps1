@@ -13,6 +13,7 @@ try {
       --exclude "./apps/web/.next" `
       --exclude "./packages/contracts/artifacts" `
       --exclude "./packages/contracts/cache" `
+      --exclude "./packages/contracts/typechain-types" `
       --exclude "./circle-court-codespace.tar.gz" `
       -czf $archive .
   Write-Host "Created $archive"
