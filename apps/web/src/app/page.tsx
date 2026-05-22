@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Bot, CircleDollarSign, Gavel, ShieldCheck, Sparkles, WalletCards } from "lucide-react";
+import { ArrowRight, Bot, CircleDollarSign, ShieldCheck, Sparkles, WalletCards } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,25 +25,7 @@ export default function Home() {
   return (
     <main className="relative min-h-screen overflow-hidden">
       <div className="mesh-line pointer-events-none absolute inset-0" />
-      <section className="mx-auto flex min-h-[92vh] max-w-7xl flex-col px-4 py-5 sm:px-6 lg:px-8">
-        <nav className="z-10 flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 backdrop-blur-xl">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <Gavel className="h-5 w-5" />
-            </div>
-            <span className="font-display text-lg font-semibold">Circle Court</span>
-          </Link>
-          <div className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">
-            <Link href="/dashboard">Dashboard</Link>
-            <Link href="/contracts/new">Create</Link>
-            <Link href="/wallet">Wallet</Link>
-            <Link href="/agent">Agents</Link>
-          </div>
-          <Button asChild size="sm">
-            <Link href="/dashboard">Enter Court</Link>
-          </Button>
-        </nav>
-
+      <section className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl flex-col px-4 py-5 sm:px-6 lg:px-8">
         <div className="z-10 grid flex-1 items-center gap-8 py-12 lg:grid-cols-[1.02fr_0.98fr]">
           <div className="max-w-3xl">
             <Badge className="mb-5 border-primary/30 bg-primary/10 text-blue-100">Arc Testnet - Circle Agent Stack - LLM Jury</Badge>

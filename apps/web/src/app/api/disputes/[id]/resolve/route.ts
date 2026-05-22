@@ -11,10 +11,49 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
   const { id } = await params;
   const body = await request.json().catch(() => ({}));
-  const disputeNarrative = JSON.stringify({ dispute: id, seed: logoDispute, evidence: body.evidence ?? [] });
-  const verdict = await buildConsensus(disputeNarrative, logoDispute.amountUsdc);
+  const contract = body.contract ?? (await loadContract(id));
+  const amountUsdc = contract?.amountUsdc ?? logoDispute.amountUsdc;
+  const disputeNarrative = JSON.stringify({
+    dispute: id,
+    contract: contract ?? logoDispute,
+    evidence: body.evidence ?? [],
+    juryInstruction:
+      "Evaluate whether the contract terms were satisfied. Return a fair release, refund, split, or appeal recommendation with confidence and payout rationale."
+  });
+  const verdict = await buildConsensus(disputeNarrative, amountUsdc);
   const payout = await circleAgentStack.executePayouts(verdict.payouts);
   const auditDigest = await audit("dispute.resolve", body.actor ?? "agent", { disputeId: id, verdict, payout });
 
   return NextResponse.json({ verdict, payout, auditDigest });
+}
+
+async function loadContract(id: string) {
+  if (id === logoDispute.id) {
+    return {
+      title: logoDispute.title,
+      terms: logoDispute.summary,
+      amountUsdc: logoDispute.amountUsdc,
+      claimant: logoDispute.claimant,
+      respondent: logoDispute.respondent,
+      escrowWallet: logoDispute.escrowWallet,
+      termsHash: "0xseededlogodispute"
+    };
+  }
+
+  try {
+    const { prisma } = await import("@/lib/db");
+    const contract = await prisma.contract.findUnique({ where: { id } });
+    if (!contract) return null;
+    return {
+      title: contract.title,
+      terms: contract.terms,
+      amountUsdc: contract.amountUsdc.toString(),
+      claimant: contract.claimant,
+      respondent: contract.respondent,
+      escrowWallet: contract.escrowWallet,
+      termsHash: contract.termsHash
+    };
+  } catch {
+    return null;
+  }
 }

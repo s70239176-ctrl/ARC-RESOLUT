@@ -8,6 +8,7 @@ Fund your deployer wallet with Arc Testnet USDC from the Circle faucet, then dep
 cp .env.example .env
 ARC_DEPLOYER_PRIVATE_KEY=0x...
 USDC_ADDRESS=0x...
+JURY_BRIDGE_ADDRESS=0x... # optional; defaults to deployer if omitted
 pnpm --filter @circle-court/contracts deploy:arc
 ```
 
@@ -63,7 +64,9 @@ pnpm --filter @circle-court/web seed
 2. Connect a wallet.
 3. Switch to Arc Testnet.
 4. Use the faucet to fund testnet USDC.
-5. Create a contract with a counterparty wallet address.
-6. Confirm the registry transaction, USDC approval, and escrow funding transaction.
+5. Create an agreement with statement, guidelines, evidence rules, counterparty wallet, and escrow amount.
+6. Confirm the USDC approval and factory `createAgreement` transaction.
+7. Agent B opens the agreement and calls `acceptAgreement`.
+8. Parties propose matching outcomes for instant 2-of-2 resolution, or raise a dispute and submit evidence.
 
-The escrow is funded from the connected wallet. It is not a simulation.
+The escrow is funded from Agent A’s connected wallet inside the factory call. It is not a simulation.

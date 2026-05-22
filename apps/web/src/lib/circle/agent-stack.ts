@@ -114,17 +114,23 @@ export class CircleAgentStack {
     payerAddress: string;
     payeeAddress: string;
     terms: string;
+    guidelines: string;
+    evidenceRules: string;
+    joinDeadlineHours: string;
+    evidenceWindowHours: string;
+    agentAEvidenceDefinition?: string;
+    agentBEvidenceDefinition?: string;
     metadataJson?: string;
     metadataFileName?: string;
   }) {
     const wallet = await this.createOrLinkAgentWallet(params.subjectId);
-    const metadataSource = JSON.stringify({
-      terms: params.terms,
-      metadataJson: params.metadataJson ?? null,
-      metadataFileName: params.metadataFileName ?? null,
-      counterparty: params.counterparty,
-      payerAddress: params.payerAddress,
-      payeeAddress: params.payeeAddress
+    const statementSource = JSON.stringify({ terms: params.terms, metadataJson: params.metadataJson ?? null });
+    const guidelinesSource = JSON.stringify({ guidelines: params.guidelines, joinDeadlineHours: params.joinDeadlineHours });
+    const evidenceSource = JSON.stringify({
+      evidenceRules: params.evidenceRules,
+      evidenceWindowHours: params.evidenceWindowHours,
+      agentAEvidenceDefinition: params.agentAEvidenceDefinition ?? null,
+      agentBEvidenceDefinition: params.agentBEvidenceDefinition ?? null
     });
 
     return {
@@ -133,8 +139,12 @@ export class CircleAgentStack {
       payerAddress: params.payerAddress,
       payeeAddress: params.payeeAddress,
       amountUsdc: params.amountUsdc,
+      joinDeadlineSeconds: String(Number(params.joinDeadlineHours) * 3600),
+      evidenceWindowSeconds: String(Number(params.evidenceWindowHours) * 3600),
       counterparty: params.counterparty,
-      termsHash: `0x${crypto.createHash("sha256").update(metadataSource).digest("hex")}`,
+      termsHash: `0x${crypto.createHash("sha256").update(statementSource).digest("hex")}`,
+      guidelinesHash: `0x${crypto.createHash("sha256").update(guidelinesSource).digest("hex")}`,
+      evidenceRulesHash: `0x${crypto.createHash("sha256").update(evidenceSource).digest("hex")}`,
       metadataUri: params.metadataFileName ? `json-upload://${params.metadataFileName}` : "inline-json://contract-terms",
       metadataJson: params.metadataJson ? JSON.parse(params.metadataJson) : null,
       status: "awaiting_user_wallet_funding",

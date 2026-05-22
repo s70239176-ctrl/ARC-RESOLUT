@@ -2,5 +2,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export * as test from "./test";
+export { CircleCourtAgreement__factory } from "./CircleCourtAgreement__factory";
 export { CircleCourtEscrow__factory } from "./CircleCourtEscrow__factory";
 export { CircleCourtRegistry__factory } from "./CircleCourtRegistry__factory";

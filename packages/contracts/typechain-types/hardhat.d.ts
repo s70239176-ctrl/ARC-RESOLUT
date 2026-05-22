@@ -58,6 +58,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ReentrancyGuard__factory>;
     getContractFactory(
+      name: "CircleCourtAgreement",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.CircleCourtAgreement__factory>;
+    getContractFactory(
       name: "CircleCourtEscrow",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.CircleCourtEscrow__factory>;
@@ -126,6 +130,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.ReentrancyGuard>;
     getContractAt(
+      name: "CircleCourtAgreement",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.CircleCourtAgreement>;
+    getContractAt(
       name: "CircleCourtEscrow",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -186,6 +195,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ReentrancyGuard>;
     deployContract(
+      name: "CircleCourtAgreement",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.CircleCourtAgreement>;
+    deployContract(
       name: "CircleCourtEscrow",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.CircleCourtEscrow>;
@@ -253,6 +266,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ReentrancyGuard>;
+    deployContract(
+      name: "CircleCourtAgreement",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.CircleCourtAgreement>;
     deployContract(
       name: "CircleCourtEscrow",
       args: any[],

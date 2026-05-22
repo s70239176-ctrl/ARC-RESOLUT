@@ -11,7 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { arcTestnet } from "@/components/providers";
-import { erc20Abi, escrowAbi, registryAbi } from "@/lib/contracts/abis";
+import { erc20Abi, registryAbi } from "@/lib/contracts/abis";
+import { saveRecentContract } from "@/components/contracts-list";
 
 export default function NewContractPage() {
   const [result, setResult] = useState<Record<string, unknown> | null>(null);
@@ -52,6 +53,12 @@ export default function NewContractPage() {
         payeeAddress: String(formData.get("payeeAddress") ?? ""),
         amountUsdc: String(formData.get("amountUsdc") ?? ""),
         terms: String(formData.get("terms") ?? ""),
+        guidelines: String(formData.get("guidelines") ?? ""),
+        evidenceRules: String(formData.get("evidenceRules") ?? ""),
+        joinDeadlineHours: String(formData.get("joinDeadlineHours") ?? "72"),
+        evidenceWindowHours: String(formData.get("evidenceWindowHours") ?? "48"),
+        agentAEvidenceDefinition: String(formData.get("agentAEvidenceDefinition") ?? ""),
+        agentBEvidenceDefinition: String(formData.get("agentBEvidenceDefinition") ?? ""),
         metadataJson: metadataJson || undefined,
         metadataFileName: metadataFile instanceof File ? metadataFile.name : undefined
       };
@@ -70,52 +77,89 @@ export default function NewContractPage() {
       const escrow = prepared.escrow as {
         amountUsdc: string;
         termsHash: `0x${string}`;
+        guidelinesHash: `0x${string}`;
+        evidenceRulesHash: `0x${string}`;
+        joinDeadlineSeconds: string;
+        evidenceWindowSeconds: string;
         metadataUri: string;
         payeeAddress: `0x${string}`;
       };
       const amount = parseUnits(escrow.amountUsdc, 6);
 
-      setPhase("Creating escrow contract on Arc Testnet...");
-      const createHash = await writeContractAsync({
-        address: registryAddress,
-        abi: registryAbi,
-        functionName: "createEscrow",
-        args: [address, escrow.payeeAddress, amount, escrow.termsHash, escrow.metadataUri],
-        chainId: arcTestnet.id
-      });
-      const createReceipt = await publicClient.waitForTransactionReceipt({ hash: createHash });
-      const escrowAddress = createReceipt.logs.reduce<`0x${string}` | null>((found, log) => {
-        if (found || log.address.toLowerCase() !== registryAddress.toLowerCase()) return found;
-        try {
-          const decoded = decodeEventLog({ abi: registryAbi, data: log.data, topics: log.topics });
-          return decoded.eventName === "EscrowCreated" ? decoded.args.escrow : null;
-        } catch {
-          return null;
-        }
-      }, null);
-      if (!escrowAddress) throw new Error("EscrowCreated event was not found in the registry transaction.");
-
-      setPhase("Approving USDC for the escrow contract...");
+      setPhase("Approving USDC for the agreement factory...");
       const approveHash = await writeContractAsync({
         address: usdcAddress,
         abi: erc20Abi,
         functionName: "approve",
-        args: [escrowAddress, amount],
+        args: [registryAddress, amount],
         chainId: arcTestnet.id
       });
       await publicClient.waitForTransactionReceipt({ hash: approveHash });
 
-      setPhase("Funding escrow from your wallet...");
-      const fundHash = await writeContractAsync({
-        address: escrowAddress,
-        abi: escrowAbi,
-        functionName: "fund",
+      setPhase("Creating agreement and escrowing USDC through the factory...");
+      const createHash = await writeContractAsync({
+        address: registryAddress,
+        abi: registryAbi,
+        functionName: "createAgreement",
+        args: [
+          escrow.payeeAddress,
+          amount,
+          BigInt(escrow.joinDeadlineSeconds),
+          BigInt(escrow.evidenceWindowSeconds),
+          escrow.termsHash,
+          escrow.guidelinesHash,
+          escrow.evidenceRulesHash,
+          escrow.metadataUri
+        ],
         chainId: arcTestnet.id
       });
-      await publicClient.waitForTransactionReceipt({ hash: fundHash });
+      const createReceipt = await publicClient.waitForTransactionReceipt({ hash: createHash });
+      const agreementAddress = createReceipt.logs.reduce<`0x${string}` | null>((found, log) => {
+        if (found || log.address.toLowerCase() !== registryAddress.toLowerCase()) return found;
+        try {
+          const decoded = decodeEventLog({ abi: registryAbi, data: log.data, topics: log.topics });
+          return decoded.eventName === "AgreementCreated" ? decoded.args.agreement : null;
+        } catch {
+          return null;
+        }
+      }, null);
+      if (!agreementAddress) throw new Error("AgreementCreated event was not found in the factory transaction.");
 
-      setPhase("Escrow funded on Arc Testnet.");
-      setResult({ ...prepared, onchain: { escrowAddress, createHash, approveHash, fundHash, status: "funded" } });
+      await fetch(`/api/contracts/${prepared.contractId}/funded`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          escrowAddress: agreementAddress,
+          createHash,
+          approveHash,
+          fundHash: createHash,
+          actor: address
+        })
+      }).catch(() => null);
+
+      saveRecentContract({
+        id: prepared.contractId,
+        title: `Escrow with ${payload.counterparty}`,
+        status: "funded",
+        claimant: address,
+        respondent: payload.payeeAddress,
+        amountUsdc: payload.amountUsdc,
+        escrowWallet: agreementAddress,
+        termsHash: escrow.termsHash,
+        terms: [
+          `Agreement statement:\n${payload.terms}`,
+          `Resolution guidelines:\n${payload.guidelines}`,
+          `Evidence rules:\n${payload.evidenceRules}`,
+          `Agent A evidence definition:\n${payload.agentAEvidenceDefinition}`,
+          `Agent B evidence definition:\n${payload.agentBEvidenceDefinition}`,
+          `Join deadline hours:\n${payload.joinDeadlineHours}`,
+          `Evidence window hours:\n${payload.evidenceWindowHours}`
+        ].join("\n\n"),
+        createdAt: new Date().toISOString()
+      });
+
+      setPhase("Agreement deployed and escrow funded on Arc Testnet.");
+      setResult({ ...prepared, onchain: { agreementAddress, createHash, approveHash, status: "funded" } });
     } catch (error) {
       setPhase(error instanceof Error ? error.message : "Escrow creation failed.");
       setResult({ error: error instanceof Error ? error.message : "Unknown error" });
@@ -165,15 +209,55 @@ export default function NewContractPage() {
               >
                 <Input name="amountUsdc" placeholder="Example: 10.00" />
               </FieldGuide>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <FieldGuide
+                  label="Agent B join deadline"
+                  help="How many hours Agent B has to accept the agreement after funding."
+                >
+                  <Input name="joinDeadlineHours" placeholder="72" defaultValue="72" />
+                </FieldGuide>
+                <FieldGuide
+                  label="Evidence window"
+                  help="How many hours parties have to submit evidence after a dispute is raised."
+                >
+                  <Input name="evidenceWindowHours" placeholder="48" defaultValue="48" />
+                </FieldGuide>
+              </div>
               <FieldGuide
-                label="Contract instructions"
-                help="Write the agreement clearly: deliverables, deadline, acceptance criteria, evidence rules, and how funds should split if the jury finds partial performance."
+                label="Agreement statement"
+                help="Write the core agreement: deliverables, deadline, price, parties, and acceptance criteria."
               >
                 <Textarea
                   name="terms"
                   placeholder="Describe the agreement, acceptance criteria, evidence standards, and payout policy."
                 />
               </FieldGuide>
+              <FieldGuide
+                label="Resolution guidelines"
+                help="Tell agents and the jury how to evaluate success, partial work, refunds, deadlines, and acceptable settlement outcomes."
+              >
+                <Textarea name="guidelines" placeholder="Example: if delivery is usable but late, release 70%; if no delivery, refund Agent A." />
+              </FieldGuide>
+              <FieldGuide
+                label="Evidence rules"
+                help="Define what evidence both agents may submit if there is a dispute: files, URLs, signed messages, screenshots, commits, invoices, or model logs."
+              >
+                <Textarea name="evidenceRules" placeholder="Example: accept dated files, GitHub commits, signed delivery receipts, and model output logs." />
+              </FieldGuide>
+              <div className="grid gap-4 lg:grid-cols-2">
+                <FieldGuide
+                  label="Agent A evidence definition"
+                  help="Define what Agent A must provide if they claim non-performance, late delivery, or refund eligibility."
+                >
+                  <Textarea name="agentAEvidenceDefinition" placeholder="Example: original brief, payment receipt, rejection notes, screenshots, timestamps." />
+                </FieldGuide>
+                <FieldGuide
+                  label="Agent B evidence definition"
+                  help="Define what Agent B must provide if they claim completion, delivery, or release eligibility."
+                >
+                  <Textarea name="agentBEvidenceDefinition" placeholder="Example: delivery URL, files, signed handoff, logs, acceptance messages." />
+                </FieldGuide>
+              </div>
               <FieldGuide
                 label="Upload contract JSON"
                 help="Optional: upload a JSON file with structured terms, milestones, evidence links, model policy, or payout rules. It is hashed into the terms record."

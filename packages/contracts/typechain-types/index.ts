@@ -28,6 +28,8 @@ export type { IERC165 } from "./@openzeppelin/contracts/utils/introspection/IERC
 export { IERC165__factory } from "./factories/@openzeppelin/contracts/utils/introspection/IERC165__factory";
 export type { ReentrancyGuard } from "./@openzeppelin/contracts/utils/ReentrancyGuard";
 export { ReentrancyGuard__factory } from "./factories/@openzeppelin/contracts/utils/ReentrancyGuard__factory";
+export type { CircleCourtAgreement } from "./contracts/CircleCourtAgreement";
+export { CircleCourtAgreement__factory } from "./factories/contracts/CircleCourtAgreement__factory";
 export type { CircleCourtEscrow } from "./contracts/CircleCourtEscrow";
 export { CircleCourtEscrow__factory } from "./factories/contracts/CircleCourtEscrow__factory";
 export type { CircleCourtRegistry } from "./contracts/CircleCourtRegistry";

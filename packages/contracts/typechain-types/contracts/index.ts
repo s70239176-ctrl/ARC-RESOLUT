@@ -3,5 +3,6 @@
 /* eslint-disable */
 import type * as test from "./test";
 export type { test };
+export type { CircleCourtAgreement } from "./CircleCourtAgreement";
 export type { CircleCourtEscrow } from "./CircleCourtEscrow";
 export type { CircleCourtRegistry } from "./CircleCourtRegistry";

@@ -20,8 +20,8 @@ Important paths:
 - `apps/web/src/app/api/agent/command/route.ts`: Circle CLI-style agent command endpoint.
 - `apps/web/src/app/api/contracts/route.ts`: intelligent escrow creation API.
 - `apps/web/src/app/api/disputes/[id]/resolve/route.ts`: verdict and autonomous payout API.
-- `packages/contracts/contracts/CircleCourtEscrow.sol`: escrow vault contract.
-- `packages/contracts/contracts/CircleCourtRegistry.sol`: escrow registry and metadata anchor.
+- `packages/contracts/contracts/CircleCourtAgreement.sol`: per-agreement lifecycle contract.
+- `packages/contracts/contracts/CircleCourtRegistry.sol`: agreement factory and metadata anchor.
 - `packages/contracts/scripts/deploy-arc.ts`: Arc Testnet deployment.
 
 ## Railway Deployment Guide
@@ -65,9 +65,9 @@ USDC_ADDRESS
 
 For live escrow funding, `NEXT_PUBLIC_ESCROW_REGISTRY_ADDRESS` and `NEXT_PUBLIC_USDC_ADDRESS` must be set. The frontend uses these addresses to let the connected wallet:
 
-1. Create an escrow through `CircleCourtRegistry.createEscrow`.
-2. Approve testnet USDC to the new escrow contract.
-3. Call `CircleCourtEscrow.fund()` from the payer wallet.
+1. Approve testnet USDC to the `CircleCourtRegistry` factory.
+2. Create and fund an agreement through `CircleCourtRegistry.createAgreement`.
+3. Let Agent B call `acceptAgreement()`, then resolve by matching outcomes or AI jury.
 
 This path is not simulated. It requires the payer wallet to be on Arc Testnet and funded from the Circle faucet.
 
@@ -84,14 +84,14 @@ Faucet: https://faucet.circle.com
 
 ## Wallet Integration Setup
 
-Circle Court treats “Connect Wallet” as the payer wallet for live escrow funding. The frontend connects a human EOA through RainbowKit/Wagmi, switches to Arc Testnet, creates an escrow from the deployed registry, approves USDC, and funds the escrow directly from that wallet.
+Circle Court treats “Connect Wallet” as Agent A or Agent B’s wallet. Agent A approves USDC to the factory, calls `createAgreement`, and the registry deploys a funded agreement contract. Agent B later calls `acceptAgreement()`.
 
 Circle Agent Wallets still power the agent side of the platform: wallet creation/linking, autonomous releases, audit identities, and programmatic command execution. The user-funded escrow path avoids fake balances and requires real Arc Testnet USDC.
 
 1. Configure Circle Wallets API credentials in Railway.
 2. Set `CIRCLE_CHAIN=ARC-TESTNET`.
 3. Keep user wallets in Circle developer-controlled or agent-wallet mode.
-4. Configure spending policy allowlists in Circle Console for deployed escrow and registry contracts.
+4. Configure spending policy allowlists in Circle Console for deployed agreement and registry contracts.
 5. Use `/api/wallets/connect` from the UI or other agents.
 6. Use `/api/agent/command` for Circle CLI-style commands:
 
@@ -131,7 +131,7 @@ Open `http://localhost:3000`.
 1. Connect Wallet: connects the payer wallet on Arc Testnet.
 2. Request Test USDC: opens Circle Faucet for Arc Testnet funding.
 3. Create Intelligent Contract: submit natural language terms, optional JSON metadata, counterparty wallet, and escrow amount.
-4. Fund Escrow: the app creates an escrow through the registry, approves USDC, and calls `fund()` from the payer wallet.
+4. Fund Escrow: the app approves USDC to the registry and calls `createAgreement`, which deploys the agreement and escrows funds.
 5. Open AI Logo Design Dispute: inspect evidence, validator breakdown, confidence, and appeal window.
 6. Resolve Dispute: calls LiteLLM jury consensus, records audit log, and executes Circle Agent Stack payout intents.
 7. Agent Command Center: submit CLI-style commands with `Authorization: Bearer $AGENT_API_KEY`.

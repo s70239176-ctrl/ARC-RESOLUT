@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { ArrowUpRight, Bot, FileText, Scale, WalletCards } from "lucide-react";
+import { Bot, FileText, Scale, WalletCards } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { logoDispute } from "@/lib/seed-data";
+import { ContractsList } from "@/components/contracts-list";
 
 const items = [
   { label: "Active escrows", value: "18", icon: FileText },
@@ -42,19 +42,8 @@ export default function DashboardPage() {
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {[logoDispute, { ...logoDispute, id: "api-audit-042", title: "Agent API Audit Escrow", status: "funded", amountUsdc: "1200.00" }].map((item) => (
-              <Link key={item.id} href={`/disputes/${item.id}`} className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.045] p-4 transition hover:bg-white/[0.075]">
-                <div>
-                  <div className="font-semibold text-white">{item.title}</div>
-                  <div className="mt-1 text-sm text-muted-foreground">{item.claimant} vs {item.respondent}</div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Badge>{item.status}</Badge>
-                  <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
-                </div>
-              </Link>
-            ))}
+          <CardContent>
+            <ContractsList />
           </CardContent>
         </Card>
         <Card>

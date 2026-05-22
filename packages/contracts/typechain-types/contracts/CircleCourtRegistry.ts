@@ -23,43 +23,51 @@ import type {
   TypedContractMethod,
 } from "../common";
 
-export declare namespace CircleCourtEscrow {
-  export type PayoutStruct = { recipient: AddressLike; amount: BigNumberish };
-
-  export type PayoutStructOutput = [recipient: string, amount: bigint] & {
-    recipient: string;
-    amount: bigint;
-  };
-}
-
 export interface CircleCourtRegistryInterface extends Interface {
   getFunction(
     nameOrSignature:
-      | "createEscrow"
-      | "escrowCount"
-      | "escrows"
+      | "agreementCount"
+      | "agreements"
+      | "createAgreement"
+      | "juryBridge"
       | "owner"
       | "renounceOwnership"
-      | "resolveEscrow"
+      | "setJuryBridge"
       | "transferOwnership"
       | "usdc"
   ): FunctionFragment;
 
   getEvent(
-    nameOrSignatureOrTopic: "EscrowCreated" | "OwnershipTransferred"
+    nameOrSignatureOrTopic:
+      | "AgreementCreated"
+      | "JuryBridgeUpdated"
+      | "OwnershipTransferred"
   ): EventFragment;
 
   encodeFunctionData(
-    functionFragment: "createEscrow",
-    values: [AddressLike, AddressLike, BigNumberish, BytesLike, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "escrowCount",
+    functionFragment: "agreementCount",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "escrows",
+    functionFragment: "agreements",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "createAgreement",
+    values: [
+      AddressLike,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BytesLike,
+      BytesLike,
+      BytesLike,
+      string
+    ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "juryBridge",
+    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
@@ -67,8 +75,8 @@ export interface CircleCourtRegistryInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "resolveEscrow",
-    values: [BigNumberish, BytesLike, CircleCourtEscrow.PayoutStruct[]]
+    functionFragment: "setJuryBridge",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "transferOwnership",
@@ -77,21 +85,22 @@ export interface CircleCourtRegistryInterface extends Interface {
   encodeFunctionData(functionFragment: "usdc", values?: undefined): string;
 
   decodeFunctionResult(
-    functionFragment: "createEscrow",
+    functionFragment: "agreementCount",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "agreements", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "escrowCount",
+    functionFragment: "createAgreement",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "escrows", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "juryBridge", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "resolveEscrow",
+    functionFragment: "setJuryBridge",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -101,33 +110,57 @@ export interface CircleCourtRegistryInterface extends Interface {
   decodeFunctionResult(functionFragment: "usdc", data: BytesLike): Result;
 }
 
-export namespace EscrowCreatedEvent {
+export namespace AgreementCreatedEvent {
   export type InputTuple = [
     id: BigNumberish,
-    escrow: AddressLike,
-    payer: AddressLike,
-    payee: AddressLike,
+    agreement: AddressLike,
+    agentA: AddressLike,
+    agentB: AddressLike,
     amount: BigNumberish,
-    termsHash: BytesLike,
+    joinDeadlineSeconds: BigNumberish,
+    evidenceWindowSeconds: BigNumberish,
+    statementHash: BytesLike,
+    guidelinesHash: BytesLike,
+    evidenceRulesHash: BytesLike,
     metadataUri: string
   ];
   export type OutputTuple = [
     id: bigint,
-    escrow: string,
-    payer: string,
-    payee: string,
+    agreement: string,
+    agentA: string,
+    agentB: string,
     amount: bigint,
-    termsHash: string,
+    joinDeadlineSeconds: bigint,
+    evidenceWindowSeconds: bigint,
+    statementHash: string,
+    guidelinesHash: string,
+    evidenceRulesHash: string,
     metadataUri: string
   ];
   export interface OutputObject {
     id: bigint;
-    escrow: string;
-    payer: string;
-    payee: string;
+    agreement: string;
+    agentA: string;
+    agentB: string;
     amount: bigint;
-    termsHash: string;
+    joinDeadlineSeconds: bigint;
+    evidenceWindowSeconds: bigint;
+    statementHash: string;
+    guidelinesHash: string;
+    evidenceRulesHash: string;
     metadataUri: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace JuryBridgeUpdatedEvent {
+  export type InputTuple = [juryBridge: AddressLike];
+  export type OutputTuple = [juryBridge: string];
+  export interface OutputObject {
+    juryBridge: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -191,29 +224,33 @@ export interface CircleCourtRegistry extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
-  createEscrow: TypedContractMethod<
-    [
-      payer: AddressLike,
-      payee: AddressLike,
-      amount: BigNumberish,
-      termsHash: BytesLike,
-      metadataUri: string
-    ],
-    [string],
-    "nonpayable"
-  >;
+  agreementCount: TypedContractMethod<[], [bigint], "view">;
 
-  escrowCount: TypedContractMethod<[], [bigint], "view">;
-
-  escrows: TypedContractMethod<
+  agreements: TypedContractMethod<
     [arg0: BigNumberish],
     [
-      [string, string, string, bigint, string, string, bigint] & {
-        escrow: string;
-        payer: string;
-        payee: string;
+      [
+        string,
+        string,
+        string,
+        bigint,
+        bigint,
+        bigint,
+        string,
+        string,
+        string,
+        string,
+        bigint
+      ] & {
+        agreement: string;
+        agentA: string;
+        agentB: string;
         amount: bigint;
-        termsHash: string;
+        joinDeadlineSeconds: bigint;
+        evidenceWindowSeconds: bigint;
+        statementHash: string;
+        guidelinesHash: string;
+        evidenceRulesHash: string;
         metadataUri: string;
         createdAt: bigint;
       }
@@ -221,16 +258,29 @@ export interface CircleCourtRegistry extends BaseContract {
     "view"
   >;
 
+  createAgreement: TypedContractMethod<
+    [
+      agentB: AddressLike,
+      amount: BigNumberish,
+      joinDeadlineSeconds: BigNumberish,
+      evidenceWindowSeconds: BigNumberish,
+      statementHash: BytesLike,
+      guidelinesHash: BytesLike,
+      evidenceRulesHash: BytesLike,
+      metadataUri: string
+    ],
+    [string],
+    "nonpayable"
+  >;
+
+  juryBridge: TypedContractMethod<[], [string], "view">;
+
   owner: TypedContractMethod<[], [string], "view">;
 
   renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
 
-  resolveEscrow: TypedContractMethod<
-    [
-      id: BigNumberish,
-      verdictHash: BytesLike,
-      payouts: CircleCourtEscrow.PayoutStruct[]
-    ],
+  setJuryBridge: TypedContractMethod<
+    [juryBridge_: AddressLike],
     [void],
     "nonpayable"
   >;
@@ -248,32 +298,35 @@ export interface CircleCourtRegistry extends BaseContract {
   ): T;
 
   getFunction(
-    nameOrSignature: "createEscrow"
-  ): TypedContractMethod<
-    [
-      payer: AddressLike,
-      payee: AddressLike,
-      amount: BigNumberish,
-      termsHash: BytesLike,
-      metadataUri: string
-    ],
-    [string],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "escrowCount"
+    nameOrSignature: "agreementCount"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: "escrows"
+    nameOrSignature: "agreements"
   ): TypedContractMethod<
     [arg0: BigNumberish],
     [
-      [string, string, string, bigint, string, string, bigint] & {
-        escrow: string;
-        payer: string;
-        payee: string;
+      [
+        string,
+        string,
+        string,
+        bigint,
+        bigint,
+        bigint,
+        string,
+        string,
+        string,
+        string,
+        bigint
+      ] & {
+        agreement: string;
+        agentA: string;
+        agentB: string;
         amount: bigint;
-        termsHash: string;
+        joinDeadlineSeconds: bigint;
+        evidenceWindowSeconds: bigint;
+        statementHash: string;
+        guidelinesHash: string;
+        evidenceRulesHash: string;
         metadataUri: string;
         createdAt: bigint;
       }
@@ -281,22 +334,33 @@ export interface CircleCourtRegistry extends BaseContract {
     "view"
   >;
   getFunction(
+    nameOrSignature: "createAgreement"
+  ): TypedContractMethod<
+    [
+      agentB: AddressLike,
+      amount: BigNumberish,
+      joinDeadlineSeconds: BigNumberish,
+      evidenceWindowSeconds: BigNumberish,
+      statementHash: BytesLike,
+      guidelinesHash: BytesLike,
+      evidenceRulesHash: BytesLike,
+      metadataUri: string
+    ],
+    [string],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "juryBridge"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
     nameOrSignature: "owner"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "renounceOwnership"
   ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: "resolveEscrow"
-  ): TypedContractMethod<
-    [
-      id: BigNumberish,
-      verdictHash: BytesLike,
-      payouts: CircleCourtEscrow.PayoutStruct[]
-    ],
-    [void],
-    "nonpayable"
-  >;
+    nameOrSignature: "setJuryBridge"
+  ): TypedContractMethod<[juryBridge_: AddressLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "transferOwnership"
   ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
@@ -305,11 +369,18 @@ export interface CircleCourtRegistry extends BaseContract {
   ): TypedContractMethod<[], [string], "view">;
 
   getEvent(
-    key: "EscrowCreated"
+    key: "AgreementCreated"
   ): TypedContractEvent<
-    EscrowCreatedEvent.InputTuple,
-    EscrowCreatedEvent.OutputTuple,
-    EscrowCreatedEvent.OutputObject
+    AgreementCreatedEvent.InputTuple,
+    AgreementCreatedEvent.OutputTuple,
+    AgreementCreatedEvent.OutputObject
+  >;
+  getEvent(
+    key: "JuryBridgeUpdated"
+  ): TypedContractEvent<
+    JuryBridgeUpdatedEvent.InputTuple,
+    JuryBridgeUpdatedEvent.OutputTuple,
+    JuryBridgeUpdatedEvent.OutputObject
   >;
   getEvent(
     key: "OwnershipTransferred"
@@ -320,15 +391,26 @@ export interface CircleCourtRegistry extends BaseContract {
   >;
 
   filters: {
-    "EscrowCreated(uint256,address,address,address,uint256,bytes32,string)": TypedContractEvent<
-      EscrowCreatedEvent.InputTuple,
-      EscrowCreatedEvent.OutputTuple,
-      EscrowCreatedEvent.OutputObject
+    "AgreementCreated(uint256,address,address,address,uint256,uint256,uint256,bytes32,bytes32,bytes32,string)": TypedContractEvent<
+      AgreementCreatedEvent.InputTuple,
+      AgreementCreatedEvent.OutputTuple,
+      AgreementCreatedEvent.OutputObject
     >;
-    EscrowCreated: TypedContractEvent<
-      EscrowCreatedEvent.InputTuple,
-      EscrowCreatedEvent.OutputTuple,
-      EscrowCreatedEvent.OutputObject
+    AgreementCreated: TypedContractEvent<
+      AgreementCreatedEvent.InputTuple,
+      AgreementCreatedEvent.OutputTuple,
+      AgreementCreatedEvent.OutputObject
+    >;
+
+    "JuryBridgeUpdated(address)": TypedContractEvent<
+      JuryBridgeUpdatedEvent.InputTuple,
+      JuryBridgeUpdatedEvent.OutputTuple,
+      JuryBridgeUpdatedEvent.OutputObject
+    >;
+    JuryBridgeUpdated: TypedContractEvent<
+      JuryBridgeUpdatedEvent.InputTuple,
+      JuryBridgeUpdatedEvent.OutputTuple,
+      JuryBridgeUpdatedEvent.OutputObject
     >;
 
     "OwnershipTransferred(address,address)": TypedContractEvent<

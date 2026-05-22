@@ -14,39 +14,100 @@ export const erc20Abi = [
 export const registryAbi = [
   {
     type: "function",
-    name: "createEscrow",
+    name: "createAgreement",
     stateMutability: "nonpayable",
     inputs: [
-      { name: "payer", type: "address" },
-      { name: "payee", type: "address" },
+      { name: "agentB", type: "address" },
       { name: "amount", type: "uint256" },
-      { name: "termsHash", type: "bytes32" },
+      { name: "joinDeadlineSeconds", type: "uint256" },
+      { name: "evidenceWindowSeconds", type: "uint256" },
+      { name: "statementHash", type: "bytes32" },
+      { name: "guidelinesHash", type: "bytes32" },
+      { name: "evidenceRulesHash", type: "bytes32" },
       { name: "metadataUri", type: "string" }
     ],
-    outputs: [{ name: "escrow", type: "address" }]
+    outputs: [{ name: "agreement", type: "address" }]
   },
   {
     type: "event",
-    name: "EscrowCreated",
+    name: "AgreementCreated",
     anonymous: false,
     inputs: [
       { indexed: true, name: "id", type: "uint256" },
-      { indexed: true, name: "escrow", type: "address" },
-      { indexed: true, name: "payer", type: "address" },
-      { indexed: false, name: "payee", type: "address" },
+      { indexed: true, name: "agreement", type: "address" },
+      { indexed: true, name: "agentA", type: "address" },
+      { indexed: false, name: "agentB", type: "address" },
       { indexed: false, name: "amount", type: "uint256" },
-      { indexed: false, name: "termsHash", type: "bytes32" },
+      { indexed: false, name: "joinDeadlineSeconds", type: "uint256" },
+      { indexed: false, name: "evidenceWindowSeconds", type: "uint256" },
+      { indexed: false, name: "statementHash", type: "bytes32" },
+      { indexed: false, name: "guidelinesHash", type: "bytes32" },
+      { indexed: false, name: "evidenceRulesHash", type: "bytes32" },
       { indexed: false, name: "metadataUri", type: "string" }
     ]
   }
 ] as const;
 
-export const escrowAbi = [
+export const agreementAbi = [
   {
     type: "function",
-    name: "fund",
+    name: "acceptAgreement",
     stateMutability: "nonpayable",
     inputs: [],
+    outputs: []
+  },
+  {
+    type: "function",
+    name: "proposeOutcome",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "outcomeHash", type: "bytes32" },
+      { name: "winner", type: "address" },
+      { name: "agentAAmount", type: "uint256" },
+      { name: "agentBAmount", type: "uint256" },
+      { name: "uri", type: "string" }
+    ],
+    outputs: []
+  },
+  {
+    type: "function",
+    name: "confirmOutcome",
+    stateMutability: "nonpayable",
+    inputs: [{ name: "proposer", type: "address" }],
+    outputs: []
+  },
+  {
+    type: "function",
+    name: "raiseDispute",
+    stateMutability: "nonpayable",
+    inputs: [{ name: "reasonUri", type: "string" }],
+    outputs: []
+  },
+  {
+    type: "function",
+    name: "submitEvidence",
+    stateMutability: "nonpayable",
+    inputs: [{ name: "evidenceUri", type: "string" }],
+    outputs: []
+  },
+  {
+    type: "function",
+    name: "claimFunds",
+    stateMutability: "nonpayable",
+    inputs: [],
+    outputs: []
+  },
+  {
+    type: "function",
+    name: "submitJuryVerdict",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "verdictHash", type: "bytes32" },
+      { name: "winner", type: "address" },
+      { name: "agentAAmount", type: "uint256" },
+      { name: "agentBAmount", type: "uint256" },
+      { name: "uri", type: "string" }
+    ],
     outputs: []
   }
 ] as const;
