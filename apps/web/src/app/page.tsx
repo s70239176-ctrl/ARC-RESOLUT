@@ -1,24 +1,15 @@
 import Link from "next/link";
-import { ArrowRight, Bot, CircleDollarSign, ShieldCheck, Sparkles, WalletCards } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { logoDispute } from "@/lib/seed-data";
-import { usd } from "@/lib/utils";
 import { HomeWalletConnect } from "@/components/home-wallet-connect";
-import type { LucideIcon } from "lucide-react";
+import { HomeVerdictHistory, HomeVerdictPanel } from "@/components/home-verdicts";
 
 const stats = [
   ["Escrow volume", "$2.8M test USDC"],
   ["Median verdict", "48 sec"],
   ["Agent actions", "128k"],
   ["Nanofees", "$0.000001"]
-];
-
-const featureRows: Array<[string, LucideIcon, string]> = [
-  ["Agent Wallet Escrow", WalletCards, "Programmable Circle wallet holds USDC"],
-  ["LLM Jury", Bot, "3-model consensus with confidence scoring"],
-  ["Autonomous Payout", CircleDollarSign, "Gateway-powered nanopayment fees"]
 ];
 
 export default function Home() {
@@ -56,49 +47,10 @@ export default function Home() {
             </div>
           </div>
 
-          <Card className="relative overflow-hidden">
-            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-800 via-primary to-blue-200" />
-            <CardHeader>
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <CardTitle className="text-xl">{logoDispute.title}</CardTitle>
-                  <p className="mt-1 text-sm text-muted-foreground">Verdict preview with evidence and autonomous payout rails.</p>
-                </div>
-                <Badge>{usd(logoDispute.amountUsdc)} escrow</Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-3 gap-3">
-                {logoDispute.evidence.map((item) => (
-                  <div key={item.name} className="rounded-xl border border-white/10 bg-black/20 p-2">
-                    <img src={item.image} alt={item.name} className="aspect-square w-full rounded-lg object-cover" />
-                  </div>
-                ))}
-              </div>
-              <div className="mt-6 grid gap-3">
-                {featureRows.map(([title, Icon, copy]) => (
-                  <div key={String(title)} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.045] p-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/12 text-primary">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <div className="text-sm font-semibold text-white">{title}</div>
-                      <div className="text-xs text-muted-foreground">{copy}</div>
-                    </div>
-                    <Sparkles className="ml-auto h-4 w-4 animate-consensus-pulse text-primary" />
-                  </div>
-                ))}
-              </div>
-              <div className="mt-6 rounded-xl border border-primary/20 bg-primary/10 p-4">
-                <div className="flex items-center gap-2 text-sm font-semibold text-primary">
-                  <ShieldCheck className="h-4 w-4" /> Confidence {Math.round(logoDispute.verdict.confidence * 100)}%
-                </div>
-                <p className="mt-2 text-sm leading-6 text-white/78">{logoDispute.verdict.reasoning}</p>
-              </div>
-            </CardContent>
-          </Card>
+          <HomeVerdictPanel />
         </div>
       </section>
+      <HomeVerdictHistory />
     </main>
   );
 }

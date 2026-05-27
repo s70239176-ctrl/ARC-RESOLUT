@@ -18,6 +18,7 @@ export default function NewContractPage() {
   const [result, setResult] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(false);
   const [phase, setPhase] = useState("Connect your wallet and describe the contract.");
+  const [metadataFileName, setMetadataFileName] = useState("");
   const { address, isConnected, chainId } = useAccount();
   const { switchChainAsync } = useSwitchChain();
   const { writeContractAsync } = useWriteContract();
@@ -65,7 +66,13 @@ export default function NewContractPage() {
         metadataFile instanceof File && metadataFile.size > 0
           ? await metadataFile.text()
           : "";
-      if (metadataJson) JSON.parse(metadataJson);
+      if (metadataJson) {
+        try {
+          JSON.parse(metadataJson);
+        } catch {
+          throw new Error("The uploaded contract JSON is invalid. Please upload a valid .json file.");
+        }
+      }
 
       const payload = {
         subjectId: String(formData.get("subjectId") ?? ""),
@@ -285,9 +292,16 @@ export default function NewContractPage() {
               >
                 <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-blue-300/30 bg-[#071735] p-4 text-sm text-blue-100 transition hover:bg-[#0b1f49]">
                   <FileJson className="h-5 w-5 text-primary" />
-                  <span>Choose a .json file</span>
-                  <input name="metadataFile" type="file" accept="application/json,.json" className="sr-only" />
+                  <span>{metadataFileName || "Choose a .json file"}</span>
+                  <input
+                    name="metadataFile"
+                    type="file"
+                    accept="application/json,.json"
+                    className="sr-only"
+                    onChange={(event) => setMetadataFileName(event.target.files?.[0]?.name ?? "")}
+                  />
                 </label>
+                {metadataFileName ? <div className="text-xs text-blue-100/75">Attached: {metadataFileName}</div> : null}
               </FieldGuide>
               <Button disabled={loading} size="lg">
                 <Send className="h-4 w-4" /> {loading ? "Funding escrow..." : "Create and fund escrow"}

@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { Gavel, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { VerdictCard } from "@/components/verdict-card";
+import { saveConcludedVerdict, type ConcludedVerdict } from "@/lib/verdicts";
 
 type ContractDisputeContext = {
   title: string;
@@ -16,7 +18,7 @@ type ContractDisputeContext = {
 
 export function ResolveDisputeButton({ disputeId, contract }: { disputeId: string; contract?: ContractDisputeContext }) {
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<Record<string, unknown> | null>(null);
+  const [result, setResult] = useState<ConcludedVerdict | null>(null);
 
   async function resolve() {
     setLoading(true);
@@ -25,7 +27,24 @@ export function ResolveDisputeButton({ disputeId, contract }: { disputeId: strin
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ actor: "dashboard-operator", contract })
     });
-    setResult(await response.json());
+    const data = await response.json();
+    if (data.verdict) {
+      const concluded: ConcludedVerdict = {
+        disputeId,
+        contractTitle: contract?.title ?? disputeId,
+        amountUsdc: contract?.amountUsdc ?? "0",
+        verdictId: data.verdict.verdictId,
+        decision: data.verdict.decision,
+        confidence: data.verdict.confidence,
+        reasoning: data.verdict.reasoning,
+        appealWindowHours: data.verdict.appealWindowHours,
+        juryModels: data.verdict.juryModels ?? [],
+        payouts: data.verdict.payouts ?? [],
+        createdAt: new Date().toISOString()
+      };
+      saveConcludedVerdict(concluded);
+      setResult(concluded);
+    }
     setLoading(false);
   }
 
@@ -35,11 +54,7 @@ export function ResolveDisputeButton({ disputeId, contract }: { disputeId: strin
         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Gavel className="h-4 w-4" />}
         {loading ? "Jury active..." : "Resolve dispute"}
       </Button>
-      {result ? (
-        <pre className="max-h-64 overflow-auto rounded-xl border border-white/10 bg-black/50 p-4 text-xs text-primary">
-          {JSON.stringify(result, null, 2)}
-        </pre>
-      ) : null}
+      {result ? <VerdictCard verdict={result} /> : null}
     </div>
   );
 }

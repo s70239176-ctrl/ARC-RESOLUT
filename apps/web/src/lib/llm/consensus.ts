@@ -13,7 +13,12 @@ export type ConsensusVerdict = {
   verdictId: string;
   decision: string;
   confidence: number;
-  votes: JuryVote[];
+  juryModels: string[];
+  consensus: {
+    winningSignal: JuryVote["decision"];
+    agreement: string;
+    rationale: string;
+  };
   payouts: Array<{ to: string; amountUsdc: string; memo: string }>;
   reasoning: string;
   appealWindowHours: number;
@@ -68,25 +73,52 @@ export async function buildConsensus(dispute: string, escrowAmountUsdc: string):
   const models = env.JURY_MODELS.split(",").map((model) => model.trim()).filter(Boolean);
   const votes = await Promise.all(models.map((model) => askModel(model, dispute)));
   const confidence = votes.reduce((sum, vote) => sum + vote.confidence, 0) / votes.length;
-  const splitVotes = votes.filter((vote) => vote.decision === "split").length;
-  const releaseVotes = votes.filter((vote) => vote.decision === "release").length;
+  const tally = votes.reduce<Record<JuryVote["decision"], number>>(
+    (acc, vote) => {
+      acc[vote.decision] += 1;
+      return acc;
+    },
+    { release: 0, refund: 0, split: 0, appeal: 0 }
+  );
+  const winningSignal = (Object.entries(tally).sort((a, b) => b[1] - a[1])[0][0] ?? "split") as JuryVote["decision"];
   const amount = Number(escrowAmountUsdc);
-  const decision = splitVotes >= releaseVotes ? "Partial refund by LLM jury consensus" : "Release escrow by LLM jury consensus";
-  const payouts =
-    splitVotes >= releaseVotes
-      ? [
-          { to: "claimant-agent-wallet", amountUsdc: (amount * 0.4).toFixed(6), memo: "jury-award-claimant" },
-          { to: "respondent-agent-wallet", amountUsdc: (amount * 0.6).toFixed(6), memo: "jury-award-respondent" }
-        ]
-      : [{ to: "respondent-agent-wallet", amountUsdc: amount.toFixed(6), memo: "jury-release" }];
+  const decisionMap: Record<JuryVote["decision"], string> = {
+    release: "Release escrow to respondent by LLM jury consensus",
+    refund: "Refund escrow to claimant by LLM jury consensus",
+    split: "Split escrow by LLM jury consensus",
+    appeal: "Escalate for appeal by LLM jury consensus"
+  };
+  const payoutsBySignal: Record<JuryVote["decision"], Array<{ to: string; amountUsdc: string; memo: string }>> = {
+    release: [{ to: "respondent-agent-wallet", amountUsdc: amount.toFixed(6), memo: "jury-release" }],
+    refund: [{ to: "claimant-agent-wallet", amountUsdc: amount.toFixed(6), memo: "jury-refund" }],
+    split: [
+      { to: "claimant-agent-wallet", amountUsdc: (amount * 0.4).toFixed(6), memo: "jury-award-claimant" },
+      { to: "respondent-agent-wallet", amountUsdc: (amount * 0.6).toFixed(6), memo: "jury-award-respondent" }
+    ],
+    appeal: [
+      { to: "claimant-agent-wallet", amountUsdc: (amount * 0.5).toFixed(6), memo: "appeal-hold-claimant" },
+      { to: "respondent-agent-wallet", amountUsdc: (amount * 0.5).toFixed(6), memo: "appeal-hold-respondent" }
+    ]
+  };
+  const supportingVotes = votes.filter((vote) => vote.decision === winningSignal);
+  const rationale =
+    supportingVotes.length > 0
+      ? supportingVotes.map((vote) => vote.rationale).join(" ")
+      : votes.map((vote) => vote.rationale).join(" ");
+  const agreement = `${tally[winningSignal]} of ${votes.length} jurors aligned on ${winningSignal}.`;
 
   return {
     verdictId: `verdict_${crypto.randomUUID()}`,
-    decision,
+    decision: decisionMap[winningSignal],
     confidence,
-    votes,
-    payouts,
-    reasoning: votes.map((vote) => `${vote.model}: ${vote.rationale}`).join(" "),
+    juryModels: votes.map((vote) => vote.model),
+    consensus: {
+      winningSignal,
+      agreement,
+      rationale
+    },
+    payouts: payoutsBySignal[winningSignal],
+    reasoning: `${agreement} ${rationale}`,
     appealWindowHours: confidence < 0.82 ? 72 : 24
   };
 }
