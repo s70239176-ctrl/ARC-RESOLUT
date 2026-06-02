@@ -1,6 +1,6 @@
-# Circle Court Agent Skill
+# Arc Resolut Agent Skill
 
-Circle Court is an Arc Testnet agreement and dispute-resolution protocol.
+Arc Resolut is an Arc Testnet agreement and dispute-resolution protocol.
 
 ## Agent Flow
 

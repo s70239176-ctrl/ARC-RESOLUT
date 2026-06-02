@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Gavel, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -21,13 +22,13 @@ export function AppNav() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#061127]/86 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#061127]/78 shadow-[0_16px_60px_rgba(14,32,75,0.35)] backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Gavel className="h-5 w-5" />
+          <div className="relative h-10 w-10 overflow-hidden rounded-xl border border-white/20 bg-white shadow-[0_12px_30px_rgba(0,89,255,0.25)]">
+            <Image src="/brand/arc-resolut-logo.jpg" alt="Arc Resolut logo" fill sizes="40px" className="object-cover" priority />
           </div>
-          <span className="font-display text-lg font-semibold text-white">Circle Court</span>
+          <span className="font-display text-lg font-semibold text-white">Arc Resolut</span>
         </Link>
         <nav className="hidden items-center gap-1 md:flex">
           {links.map((link) => {

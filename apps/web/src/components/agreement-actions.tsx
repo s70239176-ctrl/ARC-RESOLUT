@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, FileUp, Gavel, HandCoins, Scale } from "lucide-react";
+import { CheckCircle2, FileImage, FileUp, Gavel, HandCoins, Scale } from "lucide-react";
 import { isAddress, keccak256, parseUnits, stringToHex } from "viem";
 import { useAccount, useSwitchChain, useWriteContract } from "wagmi";
 import { Button } from "@/components/ui/button";
@@ -31,6 +31,7 @@ export function AgreementActions({ agreementAddress, agentA, agentB, amountUsdc 
   const [confirmProposer, setConfirmProposer] = useState(agentA);
   const [disputeUri, setDisputeUri] = useState("");
   const [evidenceUri, setEvidenceUri] = useState("");
+  const [evidenceImage, setEvidenceImage] = useState<{ name: string; preview: string } | null>(null);
 
   const canTransact = isAddress(agreementAddress);
 
@@ -54,6 +55,31 @@ export function AgreementActions({ agreementAddress, agentA, agentB, amountUsdc 
   }
 
   const agreement = agreementAddress as `0x${string}`;
+
+  function uploadEvidenceImage(file: File | null) {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setStatus("Please choose an image evidence file.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const preview = String(reader.result);
+      const evidenceId = `browser-image://${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "-")}`;
+      setEvidenceImage({ name: file.name, preview });
+      setEvidenceUri(evidenceId);
+      try {
+        const saved = JSON.parse(window.localStorage.getItem("arc-resolut:evidence-images") ?? "[]") as Array<unknown>;
+        window.localStorage.setItem(
+          "arc-resolut:evidence-images",
+          JSON.stringify([{ evidenceId, name: file.name, preview, createdAt: new Date().toISOString() }, ...saved].slice(0, 20))
+        );
+      } catch {
+        setStatus("Image preview loaded. Browser storage was unavailable, but you can still submit the evidence URI.");
+      }
+    };
+    reader.readAsDataURL(file);
+  }
 
   return (
     <div className="space-y-4">
@@ -142,6 +168,9 @@ export function AgreementActions({ agreementAddress, agentA, agentB, amountUsdc 
 
       <div className="space-y-3 rounded-xl border border-white/10 bg-white/[0.045] p-4">
         <div className="font-semibold text-white">Dispute and evidence</div>
+        <p className="text-sm text-blue-100/70">
+          First raise a dispute with a short reason or JSON/IPFS link. Then upload screenshots or supporting images and submit the generated evidence reference on-chain.
+        </p>
         <Textarea value={disputeUri} onChange={(event) => setDisputeUri(event.target.value)} placeholder="Dispute reason URI or short reason" />
         <Button
           variant="outline"
@@ -160,6 +189,23 @@ export function AgreementActions({ agreementAddress, agentA, agentB, amountUsdc 
           <Gavel className="h-4 w-4" />
           Raise dispute
         </Button>
+        <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-blue-200/25 bg-blue-950/30 p-5 text-center transition hover:border-blue-200/45 hover:bg-blue-900/30">
+          <FileImage className="h-6 w-6 text-blue-200" />
+          <span className="mt-2 text-sm font-medium text-white">Upload image evidence</span>
+          <span className="mt-1 text-xs text-blue-100/60">PNG, JPG, or WebP screenshots and delivery proofs</span>
+          <input
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            className="sr-only"
+            onChange={(event) => uploadEvidenceImage(event.target.files?.[0] ?? null)}
+          />
+        </label>
+        {evidenceImage ? (
+          <div className="overflow-hidden rounded-xl border border-white/10 bg-slate-950/45">
+            <img src={evidenceImage.preview} alt={evidenceImage.name} className="max-h-72 w-full object-contain" />
+            <div className="border-t border-white/10 px-3 py-2 text-xs text-blue-100/70">{evidenceImage.name}</div>
+          </div>
+        ) : null}
         <Input value={evidenceUri} onChange={(event) => setEvidenceUri(event.target.value)} placeholder="Evidence URI, JSON URL, or IPFS CID" />
         <Button
           variant="secondary"

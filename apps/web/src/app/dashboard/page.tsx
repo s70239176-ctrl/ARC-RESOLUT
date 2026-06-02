@@ -54,7 +54,7 @@ export default function DashboardPage() {
             <div className="relative overflow-hidden rounded-xl border border-white/10 bg-black/30 p-5">
               <div className="absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-primary/25 to-transparent animate-payout-flow" />
               <div className="relative space-y-4">
-                {["Escrow funded", "Jury consensus", "Appeal window", "Gateway nanopayments"].map((step, index) => (
+                {["Escrow funded", "Jury consensus", "On-chain verdict", "Winner claims USDC"].map((step, index) => (
                   <div key={step} className="flex items-center gap-3">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">{index + 1}</div>
                     <span className="text-sm text-white/86">{step}</span>
@@ -73,7 +73,7 @@ function Header() {
   return (
     <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <Badge>Circle Court Ops</Badge>
+        <Badge>Arc Resolut Ops</Badge>
         <h1 className="mt-3 font-display text-4xl font-semibold text-white">Dispute dashboard</h1>
       </div>
       <div className="flex gap-3">

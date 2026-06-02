@@ -201,7 +201,7 @@ export default function NewContractPage() {
       <Badge>Natural-language escrow</Badge>
       <h1 className="mt-4 font-display text-4xl font-semibold text-white">Create Intelligent Contract</h1>
       <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
-        Describe the deal in plain English. Circle Court turns your brief into an Agent Wallet escrow and uses the same terms as evidence if a dispute is opened.
+        Describe the deal in plain English. Arc Resolut turns your brief into a live Arc Testnet USDC escrow and uses the same terms as evidence if a dispute is opened.
       </p>
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_0.7fr]">
         <Card>
@@ -215,7 +215,7 @@ export default function NewContractPage() {
               </div>
               <FieldGuide
                 label="Your identity"
-                help="Enter the human, team, or agent ID that should appear in Circle Court audit logs."
+                help="Enter the human, team, or agent ID that should appear in Arc Resolut audit logs."
               >
                 <Input name="subjectId" placeholder="Example: northstar-labs or agent-42" />
               </FieldGuide>

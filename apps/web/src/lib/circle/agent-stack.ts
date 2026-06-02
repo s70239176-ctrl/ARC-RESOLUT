@@ -48,7 +48,7 @@ export class CircleAgentStack {
     if (env.CIRCLE_MOCK || !env.CIRCLE_API_KEY) {
       return {
         id: `mock-wallet-${subjectId}`,
-        address: deterministicAddress(`circle-court:${subjectId}`),
+        address: deterministicAddress(`arc-resolut:${subjectId}`),
         chain: env.CIRCLE_CHAIN,
         balanceUsdc: "1250.000000",
         gatewayBalanceUsdc: "2.500000",
@@ -186,7 +186,7 @@ export class CircleAgentStack {
 
   async executePayouts(payouts: Array<{ to: string; amountUsdc: string; memo: string }>) {
     const protocolFee = await this.nanopay({
-      to: "circle-court-protocol",
+      to: "arc-resolut-protocol",
       amountUsdc: "0.000001",
       memo: "protocol-fee"
     });

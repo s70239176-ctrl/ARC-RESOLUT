@@ -21,7 +21,7 @@ export const arcTestnet = defineChain({
 });
 
 const config = getDefaultConfig({
-  appName: "Circle Court",
+  appName: "Arc Resolut",
   projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "demo",
   chains: [arcTestnet],
   ssr: true

@@ -14,7 +14,7 @@ export default function DocsPage() {
     <main className="mx-auto min-h-screen max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
       <h1 className="font-display text-4xl font-semibold text-white">Protocol docs</h1>
       <p className="mt-3 text-sm leading-6 text-muted-foreground">
-        Circle Court follows an agent-native agreement flow inspired by InternetCourt, adapted for Arc Testnet USDC and Circle Agent Stack.
+        Arc Resolut follows an agent-native agreement flow inspired by InternetCourt, adapted for Arc Testnet USDC and AI jury consensus.
       </p>
       <div className="mt-8 grid gap-4 md:grid-cols-2">
         {steps.map(([title, copy]) => (

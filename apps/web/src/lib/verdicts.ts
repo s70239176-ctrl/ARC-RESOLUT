@@ -12,7 +12,7 @@ export type ConcludedVerdict = {
   createdAt: string;
 };
 
-const storageKey = "circle-court:concluded-verdicts";
+const storageKey = "arc-resolut:concluded-verdicts";
 
 export function readConcludedVerdicts(): ConcludedVerdict[] {
   if (typeof window === "undefined") return [];

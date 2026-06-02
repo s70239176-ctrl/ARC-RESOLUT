@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { usd } from "@/lib/utils";
 import type { ContractSummary } from "@/lib/contracts/types";
 
-const localKey = "circle-court:recent-contracts";
+const localKey = "arc-resolut:recent-contracts";
 
 export function saveRecentContract(contract: ContractSummary) {
   if (typeof window === "undefined") return;

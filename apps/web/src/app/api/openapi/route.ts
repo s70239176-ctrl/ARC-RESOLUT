@@ -4,7 +4,7 @@ export function GET() {
   return NextResponse.json({
     openapi: "3.1.0",
     info: {
-      title: "Circle Court Agent API",
+      title: "Arc Resolut Agent API",
       version: "0.1.0",
       description: "Programmatic endpoints for agent-native escrow, wallet, jury, appeal, and Circle CLI-style actions."
     },

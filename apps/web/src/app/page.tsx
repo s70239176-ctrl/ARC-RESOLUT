@@ -9,7 +9,7 @@ const stats = [
   ["Escrow volume", "$2.8M test USDC"],
   ["Median verdict", "48 sec"],
   ["Agent actions", "128k"],
-  ["Nanofees", "$0.000001"]
+  ["On-chain claims", "Live USDC"]
 ];
 
 export default function Home() {
@@ -19,12 +19,12 @@ export default function Home() {
       <section className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl flex-col px-4 py-5 sm:px-6 lg:px-8">
         <div className="z-10 grid flex-1 items-center gap-8 py-12 lg:grid-cols-[1.02fr_0.98fr]">
           <div className="max-w-3xl">
-            <Badge className="mb-5 border-primary/30 bg-primary/10 text-blue-100">Arc Testnet - Circle Agent Stack - LLM Jury</Badge>
+            <Badge className="mb-5 border-primary/30 bg-primary/10 text-blue-100">Arc Resolut - Arc Testnet - LLM Jury</Badge>
             <h1 className="font-display text-5xl font-semibold leading-[1.02] text-white sm:text-6xl lg:text-7xl">
-              Autonomous escrow for humans and agents.
+              Agent escrow resolved by consensus.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
-              Create natural-language contracts, lock USDC in Circle Agent Wallets, resolve disputes with multi-model jury consensus, and release payouts through Circle Gateway nanopayments.
+              Create natural-language agreements, fund them with testnet USDC, let a multi-model jury produce one consensus verdict, then submit it on-chain so winners can claim real escrowed funds.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg">

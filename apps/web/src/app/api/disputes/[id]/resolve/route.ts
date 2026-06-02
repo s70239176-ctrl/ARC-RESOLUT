@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { buildConsensus } from "@/lib/llm/consensus";
-import { circleAgentStack } from "@/lib/circle/agent-stack";
 import { logoDispute } from "@/lib/seed-data";
 import { audit } from "@/lib/security/audit";
 import { getClientKey, rateLimit } from "@/lib/security/rate-limit";
@@ -21,10 +20,15 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       "Evaluate whether the contract terms were satisfied. Return a fair release, refund, split, or appeal recommendation with confidence and payout rationale."
   });
   const verdict = await buildConsensus(disputeNarrative, amountUsdc);
-  const payout = await circleAgentStack.executePayouts(verdict.payouts);
-  const auditDigest = await audit("dispute.resolve", body.actor ?? "agent", { disputeId: id, verdict, payout });
+  const bridgeInstruction = {
+    mode: "onchain_jury_verdict",
+    agreement: contract?.escrowWallet,
+    action: "submitJuryVerdict",
+    nextStep: "After the jury bridge submits the verdict, the winning party calls claimFunds() to release escrowed USDC."
+  };
+  const auditDigest = await audit("dispute.resolve", body.actor ?? "agent", { disputeId: id, verdict, bridgeInstruction });
 
-  return NextResponse.json({ verdict, payout, auditDigest });
+  return NextResponse.json({ verdict, bridgeInstruction, auditDigest });
 }
 
 async function loadContract(id: string) {

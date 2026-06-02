@@ -27,15 +27,14 @@
 }
 
 html {
-  background: #061127;
+  background: #05091f;
 }
 
 body {
   min-height: 100vh;
   background:
-    radial-gradient(circle at 18% 0%, rgba(62, 123, 255, 0.24), transparent 34rem),
-    radial-gradient(circle at 84% 8%, rgba(139, 170, 255, 0.16), transparent 32rem),
-    linear-gradient(180deg, #061127 0%, #081a36 46%, #030814 100%);
+    linear-gradient(115deg, rgba(15, 32, 96, 0.96) 0%, rgba(4, 10, 35, 0.98) 34%, rgba(20, 71, 145, 0.82) 67%, rgba(3, 9, 26, 1) 100%),
+    linear-gradient(180deg, #081633 0%, #071022 52%, #030814 100%);
   color: hsl(var(--foreground));
   letter-spacing: 0;
 }
@@ -45,10 +44,17 @@ body {
 }
 
 .glass {
-  background: linear-gradient(135deg, rgba(25, 48, 94, 0.72), rgba(8, 20, 48, 0.62));
-  border: 1px solid rgba(151, 178, 255, 0.16);
-  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.42);
+  background: linear-gradient(135deg, rgba(35, 65, 143, 0.66), rgba(7, 18, 52, 0.72), rgba(14, 84, 132, 0.44));
+  border: 1px solid rgba(178, 203, 255, 0.18);
+  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(22px);
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, #ffffff, #9cc8ff 45%, #62e0ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .mesh-line {

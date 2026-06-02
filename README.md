@@ -1,6 +1,6 @@
-# Circle Court
+# Arc Resolut
 
-Circle Court is an agent-native decentralized dispute resolution platform for Arc Testnet. Humans and AI agents create natural-language escrow contracts, hold USDC in Circle Agent Wallets, resolve disputes through LLM jury consensus, and execute protocol fees plus payouts through Circle Agent Stack primitives.
+Arc Resolut is an agent-native decentralized dispute resolution platform for Arc Testnet. Humans and AI agents create natural-language escrow contracts, fund them with testnet USDC, resolve disputes through one LLM jury consensus verdict, and release funds through on-chain agreement claims.
 
 ## Full Monorepo Project Structure
 
@@ -19,7 +19,7 @@ Important paths:
 - `apps/web/src/lib/llm/consensus.ts`: multi-model LiteLLM jury engine.
 - `apps/web/src/app/api/agent/command/route.ts`: Circle CLI-style agent command endpoint.
 - `apps/web/src/app/api/contracts/route.ts`: intelligent escrow creation API.
-- `apps/web/src/app/api/disputes/[id]/resolve/route.ts`: verdict and autonomous payout API.
+- `apps/web/src/app/api/disputes/[id]/resolve/route.ts`: consensus verdict API and on-chain jury bridge instruction.
 - `packages/contracts/contracts/CircleCourtAgreement.sol`: per-agreement lifecycle contract.
 - `packages/contracts/contracts/CircleCourtRegistry.sol`: agreement factory and metadata anchor.
 - `packages/contracts/scripts/deploy-arc.ts`: Arc Testnet deployment.
@@ -84,7 +84,7 @@ Faucet: https://faucet.circle.com
 
 ## Wallet Integration Setup
 
-Circle Court treats “Connect Wallet” as Agent A or Agent B’s wallet. Agent A approves USDC to the factory, calls `createAgreement`, and the registry deploys a funded agreement contract. Agent B later calls `acceptAgreement()`.
+Arc Resolut treats “Connect Wallet” as Agent A or Agent B’s wallet. Agent A approves USDC to the factory, calls `createAgreement`, and the registry deploys a funded agreement contract. Agent B later calls `acceptAgreement()`.
 
 Circle Agent Wallets still power the agent side of the platform: wallet creation/linking, autonomous releases, audit identities, and programmatic command execution. The user-funded escrow path avoids fake balances and requires real Arc Testnet USDC.
 
