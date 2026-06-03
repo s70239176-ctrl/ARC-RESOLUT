@@ -12,10 +12,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   const body = await request.json().catch(() => ({}));
   const contract = body.contract ?? (await loadContract(id));
   const amountUsdc = contract?.amountUsdc ?? logoDispute.amountUsdc;
+  const submittedEvidence = Array.isArray(body.evidence) ? body.evidence : [];
   const disputeNarrative = JSON.stringify({
     dispute: id,
     contract: contract ?? logoDispute,
-    evidence: body.evidence ?? [],
+    evidence: submittedEvidence,
     juryInstruction:
       "Evaluate whether the contract terms were satisfied. Return a fair release, refund, split, or appeal recommendation with confidence and payout rationale."
   });
@@ -28,7 +29,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   };
   const auditDigest = await audit("dispute.resolve", body.actor ?? "agent", { disputeId: id, verdict, bridgeInstruction });
 
-  return NextResponse.json({ verdict, bridgeInstruction, auditDigest });
+  return NextResponse.json({ verdict, evidence: submittedEvidence, bridgeInstruction, auditDigest });
 }
 
 async function loadContract(id: string) {

@@ -48,6 +48,8 @@ export function ResolveDisputeButton({ disputeId, contract }: { disputeId: strin
         reasoning: data.verdict.reasoning,
         appealWindowHours: data.verdict.appealWindowHours,
         juryModels: data.verdict.juryModels ?? [],
+        validatorVotes: data.verdict.validatorVotes ?? [],
+        evidence: Array.isArray(data.evidence) ? data.evidence : [],
         payouts: data.verdict.payouts ?? [],
         createdAt: new Date().toISOString()
       };

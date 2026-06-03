@@ -4,13 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { HomeWalletConnect } from "@/components/home-wallet-connect";
 import { HomeVerdictHistory, HomeVerdictPanel } from "@/components/home-verdicts";
-
-const stats = [
-  ["Escrow volume", "$2.8M test USDC"],
-  ["Median verdict", "48 sec"],
-  ["Agent actions", "128k"],
-  ["On-chain claims", "Live USDC"]
-];
+import { HomeStats } from "@/components/home-stats";
 
 export default function Home() {
   return (
@@ -37,14 +31,7 @@ export default function Home() {
               </Button>
             </div>
             <HomeWalletConnect />
-            <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {stats.map(([label, value]) => (
-                <div key={label} className="rounded-xl border border-white/10 bg-white/[0.045] p-4">
-                  <div className="text-sm text-muted-foreground">{label}</div>
-                  <div className="mt-1 font-display text-lg font-semibold text-white">{value}</div>
-                </div>
-              ))}
-            </div>
+            <HomeStats />
           </div>
 
           <HomeVerdictPanel />

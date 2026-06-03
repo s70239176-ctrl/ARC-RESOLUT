@@ -8,6 +8,20 @@ export type ConcludedVerdict = {
   reasoning: string;
   appealWindowHours: number;
   juryModels: string[];
+  validatorVotes?: Array<{
+    model: string;
+    decision: string;
+    confidence: number;
+    rationale?: string;
+    feeUsdc?: string;
+  }>;
+  evidence?: Array<{
+    name: string;
+    image?: string;
+    uri?: string;
+    caption: string;
+    type?: string;
+  }>;
   payouts: Array<{ to: string; amountUsdc: string; memo: string }>;
   createdAt: string;
 };

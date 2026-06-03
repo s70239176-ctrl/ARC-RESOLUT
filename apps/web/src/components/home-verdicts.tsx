@@ -20,6 +20,19 @@ const seedVerdict: ConcludedVerdict = {
   reasoning: logoDispute.verdict.reasoning,
   appealWindowHours: 24,
   juryModels: logoDispute.validators.map((validator) => validator.model),
+  validatorVotes: logoDispute.validators.map((validator) => ({
+    model: validator.model,
+    decision: validator.vote,
+    confidence: validator.confidence,
+    rationale: validator.rationale,
+    feeUsdc: validator.fee
+  })),
+  evidence: logoDispute.evidence.map((item) => ({
+    name: item.name,
+    image: item.image,
+    caption: item.caption,
+    type: item.type
+  })),
   payouts: logoDispute.verdict.payout.map((payout) => ({
     to: payout.recipient,
     amountUsdc: payout.amount,
@@ -62,8 +75,13 @@ export function HomeVerdictPanel() {
       <CardContent>
         <div className="grid grid-cols-3 gap-3">
           {logoDispute.evidence.map((item) => (
-            <div key={item.name} className="rounded-xl border border-white/10 bg-black/20 p-2">
-              <img src={item.image} alt={item.name} className="aspect-square w-full rounded-lg object-cover" />
+            <div key={item.name} className="group overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-blue-950 via-slate-950 to-cyan-950 p-2">
+              <div className="relative aspect-square overflow-hidden rounded-lg bg-black/30">
+                <img src={item.image} alt={item.name} className="h-full w-full object-cover opacity-95 transition duration-300 group-hover:scale-105" />
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2">
+                  <div className="truncate text-xs font-semibold text-white">{item.name}</div>
+                </div>
+              </div>
             </div>
           ))}
         </div>

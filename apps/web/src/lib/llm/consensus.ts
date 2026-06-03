@@ -19,6 +19,7 @@ export type ConsensusVerdict = {
     agreement: string;
     rationale: string;
   };
+  validatorVotes: JuryVote[];
   payouts: Array<{ to: string; amountUsdc: string; memo: string }>;
   reasoning: string;
   appealWindowHours: number;
@@ -117,6 +118,7 @@ export async function buildConsensus(dispute: string, escrowAmountUsdc: string):
       agreement,
       rationale
     },
+    validatorVotes: votes,
     payouts: payoutsBySignal[winningSignal],
     reasoning: `${agreement} ${rationale}`,
     appealWindowHours: confidence < 0.82 ? 72 : 24
